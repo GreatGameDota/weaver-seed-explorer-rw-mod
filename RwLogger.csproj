@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="lib/*.dll">
+      <Private>false</Private>
+      <CopyLocal>False</CopyLocal>
+    </Reference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "C:\Users\parke\Downloads\VSCode\rw-logger\bin\Debug\net48\RwLogger.dll" "C:\Program Files (x86)\Steam\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\rwlogger\plugins\RwLogger.dll"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
