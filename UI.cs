@@ -215,7 +215,7 @@ public class UI : RectangularMenuObject
         {"WVWA_F02|WVWA_E01", 50}, {"WVWA_F02|WVWA_H01", 10},
         
         // WVWB - dynamic warps to natural portals
-        {"WVWB_H01|WVWB_E01", 40},
+        {"WVWB_H01|WVWB_E01", 20},
         
         // WARB - dynamic warps to natural portals
         {"WARB_F03|WARB_F18", 40}, {"WARB_F03|WARB_F01", 1},
@@ -284,10 +284,15 @@ public class UI : RectangularMenuObject
                 // {
                 //     RWCustom.Custom.rainWorld.progression.miscProgressionData.watcherCampaignSeed = j;
                 var neededList = new List<string>() {
-                        "WPTA_F01", "WTDB_A17", "WTDB_A15", "WTDB_A13", "WARB_J07", "WARF_B23", "WARF_D29", "WTDA_Z08", "WTDA_Z04", "WRRA_D03", "WRRA_D05", "WSKC_A19", "WVWA_F02", //"WRFB_B05", "WRFB_D02",
+                        "WPTA_F01", "WTDB_A17", "WTDB_A15", "WTDB_A13", "WARB_J07", "WARF_B23", "WARF_D29", "WTDA_Z08", "WTDA_Z04", "WRRA_D03", "WRRA_D05", "WSKC_A19",
+                        "WVWA_F02",
+                        "WARC_C06",
+                        //"WRFB_B05", "WRFB_D02",
                     };
                 var neededList2 = new List<string>() {
-                        "WBLA_C02", "WBLA_F04", "WARC_C06", //"WVWA_F02"
+                        "WBLA_C02", "WBLA_F04",
+                        //"WARC_C06",
+                        //"WVWA_F02",
                     };
                 var warpsToBeClosed = new List<string>()
                     {
@@ -295,7 +300,9 @@ public class UI : RectangularMenuObject
                     };
                 var laterWarps = new List<string>()
                     {
-                        "WBLA_D03", "WARC_F01", "WVWB_A04", //"WVWA_F03"
+                        "WBLA_D03", "WVWB_A04",
+                        //"WARC_F01",
+                        //"WVWA_F03",
                     };
 
                 // Track closed warps
@@ -303,6 +310,10 @@ public class UI : RectangularMenuObject
                 HashSet<string> closedNaturalWarps = [];
                 int totalWarpsNeeded = 19; // 12 echo + 7 natural
                 int testIterations = 3;
+                int defaultIterations = testIterations;
+                string finalPath = "";
+                int totalWeight = 0;
+                int totalDynamicWarps = 0;
 
                 int rippleLvl = 2;
 
@@ -317,6 +328,7 @@ public class UI : RectangularMenuObject
                     string cachedText = text;
                     int cachedWorldWarpsGen = world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated;
                     string cachedWorldName = world.name;
+                    string searchPath = $"{text} -> ";
 
                     // Check region's natural warps
                     foreach (var warp in unsealedWarps)
@@ -356,6 +368,10 @@ public class UI : RectangularMenuObject
                         }
                     }
 
+                    if (closedNaturalWarps.Count >= 2 && testIterations == defaultIterations)
+                    {
+                        testIterations += 2;
+                    }
                     for (int attempt = 0; attempt < testIterations; attempt++)
                     {
                         string chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]);
@@ -363,6 +379,7 @@ public class UI : RectangularMenuObject
                         world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
                         world.name = text.Split('_')[0];
                         world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[text] = "";
+                        totalDynamicWarps++;
 
                         // Check region's natural warps
                         foreach (var warp in unsealedWarps)
@@ -424,6 +441,8 @@ public class UI : RectangularMenuObject
                                     warpsToBeClosed.Remove(warpToClose);
                                     closedEchoWarps.Add(warpToClose);
                                 }
+                                finalPath += searchPath + $"{warpToClose} echo - ";
+                                searchPath = "";
                                 neededList.RemoveAll(x => x.StartsWith(text.Split('_')[0]));
                                 neededList2.RemoveAll(x => x.StartsWith(text.Split('_')[0]));
                                 if (text.StartsWith("WTDB"))
@@ -475,6 +494,7 @@ public class UI : RectangularMenuObject
                         {
                             dynamicWarpStreak++;
                             RwLogger.logger.LogInfo($"Warp {attempt + 1}: {text}");
+                            searchPath += $"{text} -> ";
                         }
                     }
 
@@ -548,6 +568,8 @@ public class UI : RectangularMenuObject
                                 world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = cachedWorldWarpsGen;
                                 world.name = cachedWorldName;
                                 world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPointsBeforeSearch);
+                                searchPath = $"{text} -> ";
+                                totalDynamicWarps -= testIterations;
                                 RwLogger.logger.LogInfo($"Natural warps found in region. Warping to region {text.Split('_')[0]} to close warp.");
                                 while (naturalWarpToClose.Split('_')[0] != text.Split('_')[0])
                                 {
@@ -557,6 +579,8 @@ public class UI : RectangularMenuObject
                                     world.name = text.Split('_')[0];
                                     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[text] = "";
                                     RwLogger.logger.LogInfo($"Warping to {text}...");
+                                    searchPath += $"{text} -> ";
+                                    totalDynamicWarps++;
                                 }
                                 RwLogger.logger.LogInfo($"Using natural warp: {naturalWarpToClose} with weight {natWarp.Value}");
 
@@ -569,6 +593,8 @@ public class UI : RectangularMenuObject
                                 {
                                     world.name = text.Split('_')[0];
                                     RwLogger.logger.LogInfo($"Natural warp closed. Moving to {text}. Echo: {closedEchoWarps.Count}, Natural: {closedNaturalWarps.Count}");
+                                    finalPath += searchPath.Substring(0, searchPath.Length - 3) + "- " + $"{naturalWarpToClose}|{text}({natWarp.Value}) - ";
+                                    totalWeight += natWarp.Value;
                                     dynamicWarpStreak = 0;
                                 }
                             }
@@ -576,6 +602,15 @@ public class UI : RectangularMenuObject
                             {
                                 RwLogger.logger.LogInfo($"Skipping natural warp closure (saving for finale or already completed)");
                                 dynamicWarpStreak = 0; // Reset to continue with dynamic warps
+
+                                // Exclude last dynamic warp (it is added again at beginning of this loop)
+                                string[] warpStrings = searchPath.Split([" -> "], StringSplitOptions.RemoveEmptyEntries);
+                                string strippedSearchPath = "";
+                                for (int k = 0; k < warpStrings.Length - 1; k++)
+                                {
+                                    strippedSearchPath += warpStrings[k] + " -> ";
+                                }
+                                finalPath += strippedSearchPath;
                             }
                         }
                         else
@@ -590,6 +625,9 @@ public class UI : RectangularMenuObject
                     {
                         RwLogger.logger.LogInfo($"SUCCESS! All {totalWarpsNeeded} warps closed at iteration {i + 1}");
                         RwLogger.logger.LogInfo($"Echo warps: {closedEchoWarps.Count}, Natural warps: {closedNaturalWarps.Count}");
+                        RwLogger.logger.LogInfo($"Final path: {finalPath}");
+                        RwLogger.logger.LogInfo($"Total dynamic warps: {totalDynamicWarps}, Total nat warp weight: {totalWeight}");
+                        RwLogger.logger.LogInfo($"Total route score: {totalDynamicWarps + totalWeight}");
                         break;
                     }
                 }
