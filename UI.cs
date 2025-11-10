@@ -261,7 +261,7 @@ public class UI : RectangularMenuObject
                 List<string> roomsSealedByVoidWeaverCopy = [.. world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByVoidWeaver];
                 List<string> roomsSealedByWeaverAbilityCopy = [.. world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility];
                 List<string> regionsInfectedBySentientRotCopy = [.. world.game.GetStorySession.saveState.miscWorldSaveData.regionsInfectedBySentientRot];
-                // List<string> regionLoadStringsCopy = [.. world.game.GetStorySession.saveState.regionLoadStrings];
+                List<string> regionLoadStringsCopy = [.. world.game.GetStorySession.saveState.regionLoadStrings];
 
                 var chooseDynamicWarpTarget = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(x => x.GetTypes())
@@ -273,6 +273,19 @@ public class UI : RectangularMenuObject
                     RwLogger.logger.LogInfo("ChooseDynamicWarpTarget method not found via reflection.");
                     return;
                 }
+
+                // foreach (var warp in world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints)
+                // {
+                //     RwLogger.logger.LogInfo($"Discovered warp point: {warp.Key} -> {warp.Value}");
+                // }
+                // foreach (var connection in world.game.GetStorySession.saveState.regionLoadStrings)
+                // {
+                //     RwLogger.logger.LogInfo($"Portal {connection}");
+                // }
+                // foreach (RegionState state in world.game.GetStorySession.saveState.regionStates)
+                // {
+                //     RwLogger.logger.LogInfo($"{state?.regionName}");
+                // }
 
                 // string text = world.name;
                 // GetNext10Warps(world, chooseDynamicWarpTarget);
@@ -302,10 +315,6 @@ public class UI : RectangularMenuObject
                 //     SearchTrueEnding(world, chooseDynamicWarpTarget, i);
 
                 //     // Reset world state cus var is a reference
-                //     for (int k = 0; k < world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated - warps; k++)
-                //     {
-                //         world.game.GetStorySession.saveState.regionLoadStrings[world.game.GetStorySession.saveState.regionLoadStrings.Length - 1 - k] = null;
-                //     }
                 //     world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = warps;
                 //     world.game.GetStorySession.saveState.miscWorldSaveData.numberOfBadWarpsGenerated = badWarps;
                 //     world.name = worldName;
@@ -313,7 +322,7 @@ public class UI : RectangularMenuObject
                 //     world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByVoidWeaver = [.. roomsSealedByVoidWeaverCopy];
                 //     world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
                 //     world.game.GetStorySession.saveState.miscWorldSaveData.regionsInfectedBySentientRot = [.. regionsInfectedBySentientRotCopy];
-                //     // world.game.GetStorySession.saveState.regionLoadStrings = [.. regionLoadStringsCopy];
+                //     world.game.GetStorySession.saveState.regionLoadStrings = [.. regionLoadStringsCopy];
                 // }
 
                 // for (int j = 1; j < 100000; j++)
@@ -330,14 +339,14 @@ public class UI : RectangularMenuObject
                 //     world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
                 // }
 
-                GetNaturalRoute(world, chooseDynamicWarpTarget);
+                // GetNaturalRoute(world, chooseDynamicWarpTarget);
 
-                // Reset world state cus var is a reference
-                world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = warps;
-                world.name = worldName;
-                world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
-                world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByVoidWeaver = [.. roomsSealedByVoidWeaverCopy];
-                world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
+                // // Reset world state cus var is a reference
+                // world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = warps;
+                // world.name = worldName;
+                // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
+                // world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByVoidWeaver = [.. roomsSealedByVoidWeaverCopy];
+                // world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
             });
         }
     }
@@ -1120,6 +1129,45 @@ public class UI : RectangularMenuObject
 
     public void SearchTrueEnding(World world, MethodInfo chooseDynamicWarpTarget, int i)
     {
+        string text = world.name;
+        string chosen;
+
+        chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]); // dynamic warp
+        world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
+        // text = chosen.ToUpperInvariant();
+        // world.name = text.Split('_')[0];
+        AddNewRegion(world, chosen.ToUpperInvariant().Split('_')[0]);
+        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[chosen.ToUpperInvariant()] = "";
+        // RwLogger.logger.LogInfo($"Dynamic Warp: {chosen.ToUpperInvariant()}");
+
+        if (chosen.ToUpperInvariant().Equals("WPGA_B12") || chosen.ToUpperInvariant().Equals("WRFA_SK02") || chosen.ToUpperInvariant().Equals("WTDA_B01") || chosen.ToUpperInvariant().Equals("WSKD_B35") || chosen.ToUpperInvariant().Equals("WBLA_D02") || chosen.ToUpperInvariant().Equals("WARF_A01") || chosen.ToUpperInvariant().Equals("WRFA_A08"))
+        {
+            chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]); // dynamic warp
+            world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
+            text = chosen.ToUpperInvariant();
+            world.name = text.Split('_')[0];
+            AddNewRegion(world, text.Split('_')[0]);
+            world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[chosen.ToUpperInvariant()] = "";
+            // RwLogger.logger.LogInfo($"Dynamic Warp: {text}");
+            if (chosen.ToUpperInvariant().Equals("WRRA_D03"))
+            {
+                // RwLogger.logger.LogInfo($"{i}");
+                chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]); // dynamic warp
+                world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
+                text = chosen.ToUpperInvariant();
+                world.name = text.Split('_')[0];
+                world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[chosen.ToUpperInvariant()] = "";
+                // RwLogger.logger.LogInfo($"Dynamic Warp: {text}");
+                if (chosen.ToUpperInvariant().Equals("WRFB_D02") || chosen.ToUpperInvariant().Equals("WRFB_B11") || chosen.ToUpperInvariant().Equals("WRFB_B05"))
+                {
+                    RwLogger.logger.LogInfo($"{i}");
+                }
+            }
+        }
+    }
+
+    public void SearchTrueEnding2(World world, MethodInfo chooseDynamicWarpTarget, int i)
+    {
         // int rippleLvl = 6; // + badlands + turbulent + heat ducts + stormy
         string text = world.name;
         string chosen;
@@ -1145,13 +1193,15 @@ public class UI : RectangularMenuObject
         // world.game.GetStorySession.saveState.deathPersistentSaveData.rippleLevel += (float)0.5;
         // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
 
+        // world.game.GetStorySession.saveState.deathPersistentSaveData.rippleLevel -= (float)0.5;
+        // }
+
         chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, "WORA", true, false, true]); // bad warp to OR
         world.game.GetStorySession.saveState.miscWorldSaveData.numberOfBadWarpsGenerated++;
         text = chosen.ToUpperInvariant();
         world.name = text.Split('_')[0];
         // probably dont need to save in discovered warps since they're temporary one ways
         // RwLogger.logger.LogInfo($"Bad Warp: {text}");
-
 
         chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, true, true]); // dynamic rot warp
 
@@ -1167,8 +1217,6 @@ public class UI : RectangularMenuObject
         {
             RwLogger.logger.LogInfo($"{i}");
         }
-        // world.game.GetStorySession.saveState.deathPersistentSaveData.rippleLevel -= (float)0.5;
-        // }
     }
 
     public void GetNext10Warps(World world, MethodInfo chooseDynamicWarpTarget)
@@ -1248,6 +1296,31 @@ public class UI : RectangularMenuObject
                     world.name = text.Split('_')[0];
                     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[text] = "";
                     RwLogger.logger.LogInfo($"Seed Found: {i} !!!!!!!!!!!!!!!!!!!!!!!!!!");
+                }
+            }
+        }
+    }
+
+    public void AddNewRegion(World world, string region)
+    {
+        string regionTag = $"<rgB>{region}<rgA>";
+        bool regionExists = false;
+        foreach (var rl in world.game.GetStorySession.saveState.regionLoadStrings)
+        {
+            if (!string.IsNullOrEmpty(rl) && rl.Contains(regionTag))
+            {
+                regionExists = true;
+                break;
+            }
+        }
+        if (!regionExists)
+        {
+            for (int i = 0; i < world.game.GetStorySession.saveState.regionLoadStrings.Length; i++)
+            {
+                if (string.IsNullOrEmpty(world.game.GetStorySession.saveState.regionLoadStrings[i]))
+                {
+                    world.game.GetStorySession.saveState.regionLoadStrings[i] = regionTag;
+                    break;
                 }
             }
         }
