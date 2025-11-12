@@ -138,7 +138,7 @@ public class UI : RectangularMenuObject
         {"WSKA_D27|WSKA_D13", 12}, {"WSKA_D27|WSKA_N04", 15},
         
         // WSKB - dynamic warps to natural portals
-        {"WSKB_C03|WSKB_C18", 12}, {"WSKB_C03|WSKB_C07", 2},
+        {"WSKB_C03|WSKB_C18", 20}, {"WSKB_C03|WSKB_C07", 2},
         {"WSKB_C15|WSKB_C18", 25}, {"WSKB_C15|WSKB_C07", 6},
         {"WSKB_N12|WSKB_C18", 2}, {"WSKB_N12|WSKB_C07", 25},
         {"WSKB_N16|WSKB_C18", 2}, {"WSKB_N16|WSKB_C07", 25},
@@ -162,7 +162,7 @@ public class UI : RectangularMenuObject
         {"WPGA_B12|WPGA_B08", 9}, {"WPGA_B12|WPGA_B10", 6}, {"WPGA_B12|WPGA_E01", 45},
         
         // WRRA - dynamic warps to natural portals
-        {"WRRA_B06|WRRA_B01", 50}, {"WRRA_B06|WRRA_A07", 40}, {"WRRA_B06|WRRA_A26", 50},
+        {"WRRA_B06|WRRA_B01", 10}, {"WRRA_B06|WRRA_A07", 40}, {"WRRA_B06|WRRA_A26", 50},
         {"WRRA_D03|WRRA_B01", 50}, {"WRRA_D03|WRRA_A07", 35}, {"WRRA_D03|WRRA_A26", 5},
         {"WRRA_D04|WRRA_B01", 50}, {"WRRA_D04|WRRA_A07", 40}, {"WRRA_D04|WRRA_A26", 6},
         {"WRRA_D05|WRRA_B01", 50}, {"WRRA_D05|WRRA_A07", 41}, {"WRRA_D05|WRRA_A26", 5},
@@ -178,9 +178,9 @@ public class UI : RectangularMenuObject
         {"WRFB_D02|WRFB_B12", 50},
         
         // WSKD - dynamic warps to natural portals
-        {"WSKD_B05|WSKD_B38", 50}, {"WSKD_B05|WSKD_B01", 2}, {"WSKD_B05|WSKD_B12", 50}, {"WSKD_B05|WSKD_B42", 10},
+        {"WSKD_B05|WSKD_B38", 50}, {"WSKD_B05|WSKD_B01", 4}, {"WSKD_B05|WSKD_B12", 50}, {"WSKD_B05|WSKD_B42", 10},
         {"WSKD_B18|WSKD_B38", 50}, {"WSKD_B18|WSKD_B01", 50}, {"WSKD_B18|WSKD_B12", 3}, {"WSKD_B18|WSKD_B42", 3},
-        {"WSKD_B31|WSKD_B38", 15}, {"WSKD_B31|WSKD_B01", 7}, {"WSKD_B31|WSKD_B12", 16}, {"WSKD_B31|WSKD_B42", 15},
+        {"WSKD_B31|WSKD_B38", 13}, {"WSKD_B31|WSKD_B01", 7}, {"WSKD_B31|WSKD_B12", 12}, {"WSKD_B31|WSKD_B42", 10},
         {"WSKD_B35|WSKD_B38", 5}, {"WSKD_B35|WSKD_B01", 12}, {"WSKD_B35|WSKD_B12", 50}, {"WSKD_B35|WSKD_B42", 50},
         
         // WTDA - dynamic warps to natural portals
@@ -197,7 +197,7 @@ public class UI : RectangularMenuObject
         
         // WARE - dynamic warps to natural portals
         {"WARE_H01|WARE_H16", 10}, {"WARE_H01|WARE_H21", 15},
-        {"WARE_H02|WARE_H16", 3}, {"WARE_H02|WARE_H21", 5},
+        {"WARE_H02|WARE_H16", 6}, {"WARE_H02|WARE_H21", 8},
         
         // WTDB - dynamic warps to natural portals
         {"WTDB_A06|WTDB_A19", 50}, {"WTDB_A06|WTDB_A04", 2},
@@ -286,6 +286,11 @@ public class UI : RectangularMenuObject
                 // {
                 //     RwLogger.logger.LogInfo($"{state?.regionName}");
                 // }
+                // List<string> unsealedWarps = world.game.GetStorySession.saveState.RoomsWithWarpsRemainingToBeSealed(false, "");
+                // foreach (var warp in unsealedWarps)
+                // {
+                //     RwLogger.logger.LogInfo($"Unsealed warp point: {warp}");
+                // }
 
                 // string text = world.name;
                 // GetNext10Warps(world, chooseDynamicWarpTarget);
@@ -339,6 +344,26 @@ public class UI : RectangularMenuObject
                 //     world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
                 // }
 
+                // for (int j = 1; j < 100000; j++)
+                // {
+                //     RWCustom.Custom.rainWorld.progression.miscProgressionData.watcherCampaignSeed = j;
+                    try
+                    {
+                        GetFullRoute(world, chooseDynamicWarpTarget, 0);
+                    }
+                    catch (Exception e)
+                    {
+                        RwLogger.logger.LogInfo($"Exception during GetFullRoute with seed {0}: {e}");
+                    }
+
+                    // Reset world state cus var is a reference
+                    world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = warps;
+                    world.name = worldName;
+                    world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
+                    world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByVoidWeaver = [.. roomsSealedByVoidWeaverCopy];
+                    world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
+                // }
+
                 // GetNaturalRoute(world, chooseDynamicWarpTarget);
 
                 // // Reset world state cus var is a reference
@@ -349,6 +374,608 @@ public class UI : RectangularMenuObject
                 // world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
             });
         }
+    }
+
+    public void GetFullRoute(World world, MethodInfo chooseDynamicWarpTarget, int j)
+    {
+        int testIterations = 10;
+        // for (int _testIterations = 4; _testIterations < 7; _testIterations++)
+        // {
+        //     int testIterations = _testIterations;
+        int rippleLvl = 2;
+        int iterations = 20;
+        // bool resetCache = false;
+
+        string text = world.name;
+        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WTDA_B01"] = "";
+        // RwLogger.logger.LogInfo($"Generating warps starting in room {text}");
+
+        var neededList = new List<string>()
+        {
+            "WPTA_F01", "WTDB_A17", "WTDB_A15", "WTDB_A13", "WARB_J07", "WRRA_D03", "WRRA_D05",
+            //"WARF_B23", "WARF_D29", "WTDA_Z08", "WTDA_Z04",
+            //"WSKC_A19",
+            // "WVWA_F02",
+            //"WARC_C06",
+            //"WRFB_B05", "WRFB_D02",
+        };
+        var neededList3 = new List<string>()
+        { // Fetid allowed at 8 or more ripple (7 internally here)
+            "WARC_C06",
+        };
+        var neededList4 = new List<string>()
+        { // Verdant allowed at 7 or more ripple (6 internally here)
+            "WVWA_F02",
+        };
+        var neededList2 = new List<string>()
+        {
+            // "WBLA_C02", "WBLA_F04",
+            //"WARC_C06",
+            // "WVWA_F02",
+            "WARF_B23", "WARF_D29",
+        };
+        var warpsToBeClosed = new List<string>()
+        {
+            "WARF_B33", "WBLA_D03", "WTDB_A26", "WARC_F01", "WVWB_A04", "WARE_I14", "WARB_J01", "WPTA_F03", "WSKC_A23", "WTDA_Z14", "WRFB_A22", "WVWA_F03"
+        };
+        var laterWarps = new List<string>()
+        {
+            "WBLA_D03", "WVWB_A04",
+            //"WARC_F01",
+            //"WVWA_F03",
+            "WARF_B33", "WTDA_Z14",
+        };
+        var laterWarps2 = new List<string>()
+        {
+            //"WBLA_D03", "WVWB_A04",
+            "WARC_F01",
+            //"WVWA_F03",
+        };
+        var laterWarps3 = new List<string>()
+        {
+            //"WBLA_D03", "WVWB_A04",
+            // "WARC_F01",
+            "WVWA_F03",
+        };
+
+        // Track closed warps
+        HashSet<string> closedEchoWarps = [];
+        HashSet<string> closedNaturalWarps = [];
+        int totalWarpsNeeded = 12; // 12 echo + 7 natural
+        int naturalWarpsNeed = 0;
+        string finalPath = "";
+        int totalWeight = 0;
+        int totalDynamicWarps = 0;
+
+        for (int i = 0; i < iterations; i++)
+        {
+            int dynamicWarpStreak = 0; // Count consecutive dynamic warps without finding needed rooms
+            var discoveredPointsBeforeSearch = new Dictionary<string, string>(world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints);
+
+            // Get unsealed natural warps
+            List<string> unsealedWarps = world.game.GetStorySession.saveState.RoomsWithWarpsRemainingToBeSealed(false, "");
+            List<string> regionNaturalWarps = [];
+            string cachedText = text;
+            int cachedWorldWarpsGen = world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated;
+            string cachedWorldName = world.name;
+            string searchPath = $"{text} -> ";
+
+            // Check region's natural warps
+            foreach (var warp in unsealedWarps)
+            {
+                string warpRegion = warp.ToUpperInvariant().Split('_')[0];
+                if (warpRegion == text.Split('_')[0])
+                {
+                    regionNaturalWarps.Add(warp);
+                }
+            }
+
+            var naturalWeightsForRegion = new Dictionary<string, int>();
+            foreach (var natWarp in regionNaturalWarps)
+            {
+                var natUpper = natWarp.ToUpperInvariant();
+                if (natUpper.Split('_')[0] != text.Split('_')[0].ToUpperInvariant()) continue;
+
+                string key = $"{text.ToUpperInvariant()}|{natUpper}";
+                // RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key}");
+                if (warpToPortalWeights.TryGetValue(key, out int weight))
+                {
+                    naturalWeightsForRegion[key] = weight;
+                }
+                else if (i == 0) // For now just fallback for the first warp from weaver spot
+                {
+                    // If "text" dynamic warp location is after an echo or the initial weaver spot location
+                    KeyValuePair<string, int> dynamicWarpLocation = warpToPortalWeights.Where(x => x.Key.StartsWith(natUpper.Split('_')[0])).FirstOrDefault();
+                    if (dynamicWarpLocation.Key != null && dynamicWarpLocation.Key != "")
+                    {
+                        key = $"{dynamicWarpLocation.Key.Split('|')[0]}|{natUpper}";
+                        // RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key} --");
+                        if (warpToPortalWeights.TryGetValue(key, out int weight2))
+                        {
+                            naturalWeightsForRegion["-" + key] = weight2;
+                        }
+                    }
+                }
+            }
+
+            for (int attempt = 0; attempt < testIterations; attempt++)
+            {
+                string chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]);
+                text = chosen.ToUpperInvariant();
+                world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
+                world.name = text.Split('_')[0];
+                world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[text] = "";
+                totalDynamicWarps++;
+
+                // Check region's natural warps
+                foreach (var warp in unsealedWarps)
+                {
+                    string warpRegion = warp.ToUpperInvariant().Split('_')[0];
+                    if (warpRegion == text.Split('_')[0])
+                    {
+                        regionNaturalWarps.Add(warp);
+                    }
+                }
+                foreach (var natWarp in regionNaturalWarps)
+                {
+                    var natUpper = natWarp.ToUpperInvariant();
+                    if (natUpper.Split('_')[0] != text.Split('_')[0].ToUpperInvariant()) continue;
+
+                    string key = $"{text}|{natUpper}";
+                    if (warpToPortalWeights.TryGetValue(key, out int weight))
+                    {
+                        naturalWeightsForRegion[key] = weight + attempt + 1;
+                    }
+                    else
+                    {
+                        // If "text" dynamic warp location is after an echo or the initial weaver spot location
+                        // this will always be a dynamic warp location though?? so prob not needed
+                        RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key} -- SOMETHING WENT WRONG");
+                        KeyValuePair<string, int> dynamicWarpLocation = warpToPortalWeights.Where(x => x.Key.StartsWith(natUpper.Split('_')[0])).FirstOrDefault();
+                        if (dynamicWarpLocation.Key != null && dynamicWarpLocation.Key != "")
+                        {
+                            key = $"{dynamicWarpLocation.Key.Split('|')[0]}|{natUpper}";
+                            RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key} --");
+                            if (warpToPortalWeights.TryGetValue(key, out int weight2))
+                            {
+                                naturalWeightsForRegion[key] = weight2 + attempt + 1;
+                            }
+                        }
+                    }
+                }
+
+                if (neededList.Contains(text) || (neededList2.Contains(text) && rippleLvl >= 8)
+                    // || (neededList3.Contains(text) && rippleLvl >= 7))
+                    || (neededList4.Contains(text) && rippleLvl >= 6))
+                {
+                    // RwLogger.logger.LogInfo($"Warp {attempt + 1}: {text} - NEEDED");
+
+                    string warpToClose = null;
+                    while (warpsToBeClosed.Any(x => text.Split('_')[0].Equals(x.Split('_')[0])
+                        && (!laterWarps.Contains(x) || (laterWarps.Contains(x) && rippleLvl >= 8))
+                        // && (!laterWarps2.Contains(x) || (laterWarps2.Contains(x) && rippleLvl >= 7)))
+                        && (!laterWarps3.Contains(x) || (laterWarps3.Contains(x) && rippleLvl >= 6)))
+                        || text.StartsWith("WRRA"))
+                    {
+                        if (text.StartsWith("WPTA") && !text.Equals("WPTA_F01"))
+                        {
+                            break; // Hard code not crossing all of signal for echo
+                        }
+                        warpToClose = warpsToBeClosed.Where(x => x.StartsWith(text.Split('_')[0])).FirstOrDefault();
+                        if (warpToClose == null || warpToClose == "")
+                        {
+                            warpToClose = "WRRA_A26"; // Hard code desolate natural portal
+                            closedNaturalWarps.Add(warpToClose);
+                            totalWeight += warpToPortalWeights[$"{text}|{warpToClose}"]; // idk, dont count dyn warp LOE cus its technically an "echo"
+                        }
+                        else
+                        {
+                            warpsToBeClosed.Remove(warpToClose);
+                            closedEchoWarps.Add(warpToClose);
+                        }
+                        finalPath += searchPath + $"{warpToClose} echo - ";
+                        searchPath = "";
+                        neededList.RemoveAll(x => x.StartsWith(text.Split('_')[0]));
+                        neededList2.RemoveAll(x => x.StartsWith(text.Split('_')[0]));
+                        neededList3.RemoveAll(x => x.StartsWith(text.Split('_')[0]));
+                        neededList4.RemoveAll(x => x.StartsWith(text.Split('_')[0]));
+                        if (text.StartsWith("WTDB"))
+                        {
+                            neededList.RemoveAll(x => x.StartsWith("WRRA")); // Remove unecessary WRRA warps if WTDB found
+                        }
+                        CloseWarps(world, warpToClose.ToLowerInvariant());
+                        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[warpToClose] = "";
+
+                        text = GetDest(warpToClose);
+                        if (text == null)
+                        {
+                            RwLogger.logger.LogInfo($"Error getting destination for closed warp {warpToClose}");
+                            return;
+                        }
+                        world.name = text.Split('_')[0];
+                        if (!warpToClose.StartsWith("WTDA") && !warpToClose.StartsWith("WARF") && !warpToClose.StartsWith("WRRA"))
+                        // if (!warpToClose.StartsWith("WTDA") && !warpToClose.StartsWith("WARF") && !warpToClose.StartsWith("WRRA")
+                        //     && !warpToClose.StartsWith("WBLA") && !warpToClose.StartsWith("WRFB") && !warpToClose.StartsWith("WARE")
+                        //     && !warpToClose.StartsWith("WSKC"))
+                        {
+                            rippleLvl++;
+                        }
+                    }
+
+                    if (warpsToBeClosed.Count == 0)
+                    {
+                        // RwLogger.logger.LogInfo($"All echo warps closed. Echo: {closedEchoWarps.Count}, Natural: {closedNaturalWarps.Count}");
+
+                        // Need to close remaining natural warps
+                        int naturalWarpsNeeded = naturalWarpsNeed - closedNaturalWarps.Count;
+                        if (naturalWarpsNeeded > 0)
+                        {
+                            // RwLogger.logger.LogInfo($"Need to close {naturalWarpsNeeded} more natural warps");
+                        }
+                        else
+                        {
+                            // RwLogger.logger.LogInfo($"All warps closed! Total: {closedEchoWarps.Count + closedNaturalWarps.Count}");
+                            break;
+                        }
+                    }
+
+                    // if (warpToClose != null && warpToClose.Split('_')[0] == "WARB" && i > 20)
+                    // {
+                    //     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
+                    //     RwLogger.logger.LogInfo($"Resetting discovered warp points to clear cache.");
+                    // }
+                    // RwLogger.logger.LogInfo($"Generating warps from {text}");
+                    break;
+                }
+                else
+                {
+                    dynamicWarpStreak++;
+                    // RwLogger.logger.LogInfo($"Warp {attempt + 1}: {text}");
+                    searchPath += $"{text} -> ";
+                }
+            }
+
+            // If no good dynamic warps found for testIterations iterations, try natural warps
+            if (dynamicWarpStreak >= testIterations)
+            {
+                // RwLogger.logger.LogInfo($"No needed warps found in {dynamicWarpStreak} iterations. Checking natural warps...");
+
+                if (regionNaturalWarps.Count > 0)
+                {
+                    // RwLogger.logger.LogInfo($"Skipping natural warp closure (saving for finale or already completed)");
+                    dynamicWarpStreak = 0; // Reset to continue with dynamic warps
+
+                    // Exclude last dynamic warp (it is added again at beginning of this loop)
+                    string[] warpStrings = searchPath.Split([" -> "], StringSplitOptions.RemoveEmptyEntries);
+                    string strippedSearchPath = "";
+                    for (int k = 0; k < warpStrings.Length - 1; k++)
+                    {
+                        strippedSearchPath += warpStrings[k] + " -> ";
+                    }
+                    finalPath += strippedSearchPath;
+                }
+                else
+                {
+                    // RwLogger.logger.LogInfo($"No natural warps found in regions, ending search.");
+                    break;
+                }
+            }
+
+            // Check completion
+            // if (closedEchoWarps.Count + closedNaturalWarps.Count >= totalWarpsNeeded)
+            if (closedEchoWarps.Count >= totalWarpsNeeded)
+            {
+                // RwLogger.logger.LogInfo($"SUCCESS! All {totalWarpsNeeded} warps closed at iteration {i + 1}");
+                // RwLogger.logger.LogInfo($"Echo warps: {closedEchoWarps.Count}, Natural warps: {closedNaturalWarps.Count}");
+                // RwLogger.logger.LogInfo($"Final path: {finalPath}");
+                // RwLogger.logger.LogInfo($"Total dynamic warps: {totalDynamicWarps}, Total nat warp weight: {totalWeight}");
+                // RwLogger.logger.LogInfo($"Seed {j}: {totalDynamicWarps}");
+                break;
+            }
+            else if (totalDynamicWarps > 20)
+            {
+                // RwLogger.logger.LogInfo($"Seed {j}: >20");
+                break;
+            }
+        }
+        // RwLogger.logger.LogInfo("---------------------------------------------------------------------------------------------------------------------");
+
+        if (closedEchoWarps.Count < totalWarpsNeeded || totalDynamicWarps < 20)
+        {
+            RwLogger.logger.LogInfo($"Seed {j}: ");
+            return;
+        }
+
+        testIterations = 5;
+        // for (int _testIterations = 4; _testIterations < 7; _testIterations++)
+        // {
+        //     int testIterations = _testIterations;
+        // int rippleLvl = 2;
+        iterations = 20;
+        // bool resetCache = false;
+
+        text = world.name;
+        // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WTDA_B01"] = "";
+        // RwLogger.logger.LogInfo($"Generating warps starting in room {text}");
+
+        neededList = new List<string>()
+        {
+            // "WPTA_F01", "WTDB_A17", "WTDB_A15", "WTDB_A13", "WARB_J07", "WRRA_D03", "WRRA_D05",
+            //"WARF_B23", "WARF_D29", "WTDA_Z08", "WTDA_Z04",
+            //"WSKC_A19",
+            // "WVWA_F02",
+            //"WARC_C06",
+            //"WRFB_B05", "WRFB_D02",
+        };
+        neededList3 = new List<string>()
+        { // Fetid allowed at 8 or more ripple (7 internally here)
+            // "WARC_C06",
+        };
+        neededList4 = new List<string>()
+        { // Verdant allowed at 7 or more ripple (6 internally here)
+            // "WVWA_F02",
+        };
+        neededList2 = new List<string>()
+        {
+            // "WBLA_C02", "WBLA_F04",
+            //"WARC_C06",
+            // "WVWA_F02",
+            // "WARF_B23", "WARF_D29",
+        };
+        warpsToBeClosed = new List<string>()
+        {
+            // "WARF_B33", "WBLA_D03", "WTDB_A26", "WARC_F01", "WVWB_A04", "WARE_I14", "WARB_J01", "WPTA_F03", "WSKC_A23", "WTDA_Z14", "WRFB_A22", "WVWA_F03"
+        };
+        laterWarps = new List<string>()
+        {
+            "WBLA_D03", "WVWB_A04",
+            //"WARC_F01",
+            //"WVWA_F03",
+            "WARF_B33", "WTDA_Z14",
+        };
+        laterWarps2 = new List<string>()
+        {
+            //"WBLA_D03", "WVWB_A04",
+            "WARC_F01",
+            //"WVWA_F03",
+        };
+        laterWarps3 = new List<string>()
+        {
+            //"WBLA_D03", "WVWB_A04",
+            // "WARC_F01",
+            "WVWA_F03",
+        };
+
+        // Track closed warps
+        // HashSet<string> closedEchoWarps = [];
+        // HashSet<string> closedNaturalWarps = [];
+        totalWarpsNeeded = 19; // 12 echo + 7 natural
+        naturalWarpsNeed = 7; // 6 cus route include 1 at very beginning
+        // string finalPath = "";
+        // int totalWeight = 0;
+        // int totalDynamicWarps = 0;
+
+        for (int i = 0; i < iterations; i++)
+        {
+            int dynamicWarpStreak = 0; // Count consecutive dynamic warps without finding needed rooms
+            var discoveredPointsBeforeSearch = new Dictionary<string, string>(world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints);
+
+            // Get unsealed natural warps
+            List<string> unsealedWarps = world.game.GetStorySession.saveState.RoomsWithWarpsRemainingToBeSealed(false, "");
+            List<string> regionNaturalWarps = [];
+            string cachedText = text;
+            int cachedWorldWarpsGen = world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated;
+            string cachedWorldName = world.name;
+            string searchPath = $"{text} -> ";
+
+            // Check region's natural warps
+            foreach (var warp in unsealedWarps)
+            {
+                string warpRegion = warp.ToUpperInvariant().Split('_')[0];
+                if (warpRegion == text.Split('_')[0])
+                {
+                    regionNaturalWarps.Add(warp);
+                }
+            }
+
+            var naturalWeightsForRegion = new Dictionary<string, int>();
+            foreach (var natWarp in regionNaturalWarps)
+            {
+                var natUpper = natWarp.ToUpperInvariant();
+                if (natUpper.Split('_')[0] != text.Split('_')[0].ToUpperInvariant()) continue;
+
+                string key = $"{text.ToUpperInvariant()}|{natUpper}";
+                // RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key}");
+                if (warpToPortalWeights.TryGetValue(key, out int weight))
+                {
+                    naturalWeightsForRegion[key] = weight;
+                }
+                // For now just fallback for the first warp from weaver spot OR the final natural warp is in the region u end up in (rare edge case)
+                else if (i == 0 || naturalWarpsNeed - closedNaturalWarps.Count == 1)
+                {
+                    // If "text" dynamic warp location is after an echo or the initial weaver spot location
+                    KeyValuePair<string, int> dynamicWarpLocation = warpToPortalWeights.Where(x => x.Key.StartsWith(natUpper.Split('_')[0])).FirstOrDefault();
+                    if (dynamicWarpLocation.Key != null && dynamicWarpLocation.Key != "")
+                    {
+                        key = $"{dynamicWarpLocation.Key.Split('|')[0]}|{natUpper}";
+                        // RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key} --");
+                        if (warpToPortalWeights.TryGetValue(key, out int weight2))
+                        {
+                            naturalWeightsForRegion["-" + key] = weight2;
+                        }
+                    }
+                }
+            }
+
+            for (int attempt = 0; attempt < testIterations; attempt++)
+            {
+                string chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]);
+                text = chosen.ToUpperInvariant();
+                world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
+                world.name = text.Split('_')[0];
+                world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[text] = "";
+                totalDynamicWarps++;
+
+                // Check region's natural warps
+                foreach (var warp in unsealedWarps)
+                {
+                    string warpRegion = warp.ToUpperInvariant().Split('_')[0];
+                    if (warpRegion == text.Split('_')[0])
+                    {
+                        regionNaturalWarps.Add(warp);
+                    }
+                }
+                foreach (var natWarp in regionNaturalWarps)
+                {
+                    var natUpper = natWarp.ToUpperInvariant();
+                    if (natUpper.Split('_')[0] != text.Split('_')[0].ToUpperInvariant()) continue;
+
+                    string key = $"{text}|{natUpper}";
+                    if (warpToPortalWeights.TryGetValue(key, out int weight))
+                    {
+                        naturalWeightsForRegion[key] = weight + attempt + 1;
+                    }
+                    else
+                    {
+                        // If "text" dynamic warp location is after an echo or the initial weaver spot location
+                        // this will always be a dynamic warp location though?? so prob not needed
+                        RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key} -- SOMETHING WENT WRONG");
+                        KeyValuePair<string, int> dynamicWarpLocation = warpToPortalWeights.Where(x => x.Key.StartsWith(natUpper.Split('_')[0])).FirstOrDefault();
+                        if (dynamicWarpLocation.Key != null && dynamicWarpLocation.Key != "")
+                        {
+                            key = $"{dynamicWarpLocation.Key.Split('|')[0]}|{natUpper}";
+                            RwLogger.logger.LogInfo($"Checking natural warp weight for region key {key} --");
+                            if (warpToPortalWeights.TryGetValue(key, out int weight2))
+                            {
+                                naturalWeightsForRegion[key] = weight2 + attempt + 1;
+                            }
+                        }
+                    }
+                }
+
+                dynamicWarpStreak++;
+                // RwLogger.logger.LogInfo($"Warp {attempt + 1}: {text}");
+                searchPath += $"{text} -> ";
+            }
+
+            // If no good dynamic warps found for testIterations iterations, try natural warps
+            if (dynamicWarpStreak >= testIterations)
+            {
+                // RwLogger.logger.LogInfo($"No needed warps found in {dynamicWarpStreak} iterations. Checking natural warps...");
+
+                if (regionNaturalWarps.Count > 0)
+                {
+                    // Determine if we should close a natural warp
+                    int naturalWarpsStillNeeded = naturalWarpsNeed - closedNaturalWarps.Count;
+
+                    // Only close natural warp if:
+                    // 1. We need more natural warps closed
+                    // 2. It's not the last natural warp (save that for the finale)
+                    KeyValuePair<string, int> natWarp = naturalWeightsForRegion.OrderBy(x => x.Value).FirstOrDefault();
+                    bool canCloseNatWarp = naturalWarpsStillNeeded > 1 || (naturalWarpsStillNeeded == 1 && warpsToBeClosed.Count == 0);
+                    // if (canCloseNatWarp && natWarp.Value > 30 && !resetCache)
+                    // {
+                    //     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
+                    //     RwLogger.logger.LogInfo($"PERISH - Resetting discovered warp points to clear cache.");
+                    //     resetCache = true;
+                    //     text = cachedText;
+                    //     world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = cachedWorldWarpsGen;
+                    //     world.name = cachedWorldName;
+                    //     // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPointsBeforeSearch);
+                    //     totalDynamicWarps -= testIterations;
+                    //     dynamicWarpStreak = 0; // Reset to continue with dynamic warps
+                    //     RwLogger.logger.LogInfo($"Restarting warp search back at {text}");
+                    // }
+                    if (canCloseNatWarp)
+                    {
+                        string naturalWarpToClose = natWarp.Key.Split('|')[1].ToUpperInvariant();
+                        // Dynamic warp to the natural warp region
+                        text = cachedText;
+                        world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = cachedWorldWarpsGen;
+                        world.name = cachedWorldName;
+                        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPointsBeforeSearch);
+                        searchPath = $"{text} -> ";
+                        totalDynamicWarps -= testIterations;
+                        // RwLogger.logger.LogInfo($"Natural warps found in region. Warping to region {text.Split('_')[0]} to close warp.");
+                        // if (naturalWarpToClose.Split('_')[0] == text.Split('_')[0])
+                        // {
+                        //     RwLogger.logger.LogInfo($"#Something went wrong.#");
+                        // }
+                        while (!text.Equals(natWarp.Key.Split('|')[0]) && !natWarp.Key.Split('|')[0].StartsWith("-"))
+                        {
+                            string chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]);
+                            text = chosen.ToUpperInvariant();
+                            world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
+                            world.name = text.Split('_')[0];
+                            world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[text] = "";
+                            // RwLogger.logger.LogInfo($"Warping to {text}...");
+                            searchPath += $"{text} -> ";
+                            totalDynamicWarps++;
+                        }
+                        // RwLogger.logger.LogInfo($"Using natural warp: {naturalWarpToClose} with weight {natWarp.Value}");
+
+                        closedNaturalWarps.Add(naturalWarpToClose);
+                        CloseWarps(world, naturalWarpToClose.ToLowerInvariant());
+                        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[naturalWarpToClose] = "";
+
+                        text = GetDest(naturalWarpToClose);
+                        if (text != null)
+                        {
+                            world.name = text.Split('_')[0];
+                            // RwLogger.logger.LogInfo($"Natural warp closed. Moving to {text}. Echo: {closedEchoWarps.Count}, Natural: {closedNaturalWarps.Count}");
+                            finalPath += searchPath.Substring(0, searchPath.Length - 3) + "- " + $"{naturalWarpToClose}|{text}({natWarp.Value}) - ";
+                            totalWeight += natWarp.Value;
+                            dynamicWarpStreak = 0;
+                        }
+                    }
+                    // else if (!resetCache)
+                    // {
+                    //     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
+                    //     RwLogger.logger.LogInfo($"PERISH - Resetting discovered warp points to clear cache.");
+                    //     resetCache = true;
+                    //     text = cachedText;
+                    //     world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated = cachedWorldWarpsGen;
+                    //     world.name = cachedWorldName;
+                    //     // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPointsBeforeSearch);
+                    //     totalDynamicWarps -= testIterations;
+                    //     dynamicWarpStreak = 0; // Reset to continue with dynamic warps
+                    //     RwLogger.logger.LogInfo($"Restarting warp search back at {text}");
+                    // }
+                    else
+                    {
+                        // RwLogger.logger.LogInfo($"Skipping natural warp closure (saving for finale or already completed)");
+                        dynamicWarpStreak = 0; // Reset to continue with dynamic warps
+
+                        // Exclude last dynamic warp (it is added again at beginning of this loop)
+                        string[] warpStrings = searchPath.Split([" -> "], StringSplitOptions.RemoveEmptyEntries);
+                        string strippedSearchPath = "";
+                        for (int k = 0; k < warpStrings.Length - 1; k++)
+                        {
+                            strippedSearchPath += warpStrings[k] + " -> ";
+                        }
+                        finalPath += strippedSearchPath;
+                    }
+                }
+                else
+                {
+                    // RwLogger.logger.LogInfo($"No natural warps found in regions, ending search.");
+                    RwLogger.logger.LogInfo($"Seed {j}: failed to find natural portals");
+                    break;
+                }
+            }
+
+            // Check completion
+            if (closedEchoWarps.Count + closedNaturalWarps.Count >= totalWarpsNeeded)
+            {
+                RwLogger.logger.LogInfo($"SUCCESS! All {totalWarpsNeeded} warps closed at iteration {i + 1}");
+                RwLogger.logger.LogInfo($"Echo warps: {closedEchoWarps.Count}, Natural warps: {closedNaturalWarps.Count}");
+                RwLogger.logger.LogInfo($"Final path: {finalPath}");
+                RwLogger.logger.LogInfo($"Total dynamic warps: {totalDynamicWarps}, Total nat warp weight: {totalWeight}");
+                // RwLogger.logger.LogInfo($"Seed {j}: {totalDynamicWarps + totalWeight}");
+                break;
+            }
+        }
+        // RwLogger.logger.LogInfo("---------------------------------------------------------------------------------------------------------------------");
     }
 
     public void GetEchoRoute(World world, MethodInfo chooseDynamicWarpTarget)
@@ -807,8 +1434,8 @@ public class UI : RectangularMenuObject
         // Track closed warps
         HashSet<string> closedEchoWarps = [];
         HashSet<string> closedNaturalWarps = [];
-        int totalWarpsNeeded = 6; // 12 echo + 7 natural
-        int naturalWarpsNeed = 6; // 6 cus route include 1 at very beginning
+        int totalWarpsNeeded = 19; // 12 echo + 7 natural
+        int naturalWarpsNeed = 19; // 6 cus route include 1 at very beginning
         string finalPath = "";
         int totalWeight = 0;
         int totalDynamicWarps = 0;
