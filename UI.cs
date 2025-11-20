@@ -235,6 +235,7 @@ public class UI : RectangularMenuObject
         {"WARC_C06|WARC_E11", 50}, {"WARC_C06|WARC_B12", 50}
     };
 
+    // WSKA_D01 from Badlands
     private readonly List<int> SEEDS =
     [
         13, 20, 29, 49, 77, 103, 166, 177, 322, 336, 344, 346, 378, 381, 399, 408, 411, 416, 494, 507,
@@ -391,6 +392,7 @@ public class UI : RectangularMenuObject
         99828, 99845, 99900, 99931, 99949, 99972, 99976
     ];
 
+    // WSKA_D01 from Torrid
     private readonly List<int> SEEDS2 = [
         78, 101, 177, 191, 207, 249, 295, 335, 398, 574, 575, 578, 651, 655, 671, 681, 689, 718, 791,
         932, 1026, 1031, 1078, 1085, 1132, 1137, 1143, 1144, 1158, 1265, 1272, 1274, 1284, 1324, 1337, 1350, 1357, 1430, 1441,
@@ -541,6 +543,7 @@ public class UI : RectangularMenuObject
                 List<string> roomsSealedByWeaverAbilityCopy = [.. world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility];
                 List<string> regionsInfectedBySentientRotCopy = [.. world.game.GetStorySession.saveState.miscWorldSaveData.regionsInfectedBySentientRot];
                 List<string> regionLoadStringsCopy = [.. world.game.GetStorySession.saveState.regionLoadStrings];
+                int numberOfVoidWeaverEncounters = world.game.GetStorySession.saveState.miscWorldSaveData.numberOfVoidWeaverEncounters;
 
                 var chooseDynamicWarpTarget = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(x => x.GetTypes())
@@ -627,11 +630,38 @@ public class UI : RectangularMenuObject
 
                 // for (int j = 1; j < 100000; j++)
                 // {
-                foreach (int j in SEEDS)
+                foreach (int j in SEEDS2)
                 {
                     RWCustom.Custom.rainWorld.progression.miscProgressionData.watcherCampaignSeed = j;
                     try
                     {
+                        // get dyn warps
+                        List<string> dynWarps = [];
+                        string text = world.name;
+                        for (int i = 0; i < 3; i++)
+                        {
+                            string chosen = (string)chooseDynamicWarpTarget.Invoke(null, [world, text, null, false, false, true]); // dynamic warp
+                            world.game.GetStorySession.saveState.miscWorldSaveData.numberOfWarpPointsGenerated++;
+                            // text = chosen.ToUpperInvariant();
+                            // world.name = text.Split('_')[0];
+                            AddNewRegion(world, chosen.ToUpperInvariant().Split('_')[0]);
+                            world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[chosen.ToUpperInvariant()] = "";
+                            dynWarps.Add(chosen.ToUpperInvariant());
+                            // RwLogger.logger.LogInfo($"Dynamic warp {i + 1}: {chosen.ToUpperInvariant()}");
+                        }
+
+                        world.game.GetStorySession.saveState.miscWorldSaveData.numberOfVoidWeaverEncounters = 4;
+                        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
+                        // Remove entry dyn warp
+                        var keysToRemove = discoveredPoints.Keys
+                            .Where(k => !string.IsNullOrEmpty(k) && k.StartsWith("WSKA_D01", StringComparison.OrdinalIgnoreCase))
+                            .FirstOrDefault();
+                        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints.Remove(keysToRemove);
+                        // Add last dyn warp "block"
+                        // try excluding WSKA_D10 and swap last 2 dyn warps
+                        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WSKA_D10"] = "";
+                        world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[dynWarps[2]] = "";
+
                         GetFullRoute2(world, chooseDynamicWarpTarget, j);
                     }
                     catch (Exception e)
@@ -645,6 +675,8 @@ public class UI : RectangularMenuObject
                     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
                     world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByVoidWeaver = [.. roomsSealedByVoidWeaverCopy];
                     world.game.GetStorySession.saveState.miscWorldSaveData.roomsSealedByWeaverAbility = [.. roomsSealedByWeaverAbilityCopy];
+                    world.game.GetStorySession.saveState.miscWorldSaveData.numberOfVoidWeaverEncounters = numberOfVoidWeaverEncounters;
+                    world.game.GetStorySession.saveState.regionLoadStrings = [.. regionLoadStringsCopy];
                 }
 
                 // GetNaturalRoute(world, chooseDynamicWarpTarget);
@@ -1275,6 +1307,7 @@ public class UI : RectangularMenuObject
         string text = world.name;
         // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WTDA_B01"] = "";
         // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WSKA_D10"] = "";
+        // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WSKA_D01"] = "";
         // RwLogger.logger.LogInfo($"Generating warps starting in room {text}");
 
         var neededList = new List<string>()
