@@ -786,16 +786,16 @@ public class UI : RectangularMenuObject
                 bool verbose = false;
                 // for (int j = 1; j < 100000; j++)
                 // {
-                for (int type = 0; type < 7; type++)
+                for (int type = 0; type < 6; type++)
                 {
-                    // type = 1;
+                    // type = 6;
                     RwLogger.logger.LogInfo($"Type {type + 1}");
                     // foreach (int j in SEEDS2)
                     // {
                     for (int k = 0; k < SEEDS2.Count; k++)
                     {
                         int j = SEEDS2[k];
-                        // j = 56066;
+                        // j = 82405;
                         RWCustom.Custom.rainWorld.progression.miscProgressionData.watcherCampaignSeed = j;
                         try
                         {
@@ -1613,7 +1613,7 @@ public class UI : RectangularMenuObject
                     naturalWeightsForRegion[key] = weight;
                 }
                 // For now just fallback for the first warp from weaver spot OR the final natural warp is in the region u end up in (rare edge case)
-                else if (i == 0 || (naturalWarpsNeed - closedNaturalWarps.Count == 1 && warpsToBeClosed.Count == 0))
+                else if (i == 0 || (naturalWarpsNeed - closedNaturalWarps.Count == 1 && warpsToBeClosed.Count == 0 && !text.Equals("WARD_R15")))
                 {
                     // If "text" dynamic warp location is after an echo or the initial weaver spot location
                     KeyValuePair<string, int> dynamicWarpLocation = warpToPortalWeights.Where(x => x.Key.StartsWith(natUpper.Split('_')[0])).FirstOrDefault();
@@ -1801,7 +1801,7 @@ public class UI : RectangularMenuObject
                     // 1. We need more natural warps closed
                     // 2. It's not the last natural warp (save that for the finale)
                     KeyValuePair<string, int> natWarp = naturalWeightsForRegion.OrderBy(x => x.Value).FirstOrDefault();
-                    bool canCloseNatWarp = naturalWarpsStillNeeded > 1 || (naturalWarpsStillNeeded == 1 && warpsToBeClosed.Count == 0);
+                    bool canCloseNatWarp = (naturalWarpsStillNeeded > 1 || (naturalWarpsStillNeeded == 1 && warpsToBeClosed.Count == 0)) && natWarp.Key is not null;
                     // if (canCloseNatWarp && natWarp.Value > 30 && !resetCache)
                     // {
                     //     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints = new Dictionary<string, string>(discoveredPoints);
