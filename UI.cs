@@ -855,7 +855,7 @@ public class UI : RectangularMenuObject
                                     world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[dynWarps[1]] = "";
                                     // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WSKA_D01"] = "";
                                     break;
-                                case 6:
+                                case 6: // This would require sheltering post-weaver
                                     // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WSKA_D10"] = "";
                                     // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints[dynWarps[2]] = "";
                                     // world.game.GetStorySession.saveState.miscWorldSaveData.discoveredWarpPoints["WSKA_D01"] = "";
@@ -1540,7 +1540,7 @@ public class UI : RectangularMenuObject
             // "WBLA_C02", "WBLA_F04",
             //"WARC_C06",
             // "WVWA_F02",
-            // "WTDA_Z08", "WTDA_Z04",
+            "WTDA_Z08", "WTDA_Z04",
             "WARF_B23", "WARF_D29",
         };
         var warpsToBeClosed = new List<string>()
@@ -1684,7 +1684,7 @@ public class UI : RectangularMenuObject
                 }
 
                 if (neededList.Contains(text) || (neededList2.Contains(text) && rippleLvl >= 8)
-                    // || (neededList3.Contains(text) && rippleLvl >= 7))
+                    || (neededList3.Contains(text) && rippleLvl >= 7)
                     || (neededList4.Contains(text) && rippleLvl >= 6))
                 {
                     // RwLogger.logger.LogInfo($"Warp {attempt + 1}: {text} - NEEDED");
@@ -1692,7 +1692,7 @@ public class UI : RectangularMenuObject
                     string warpToClose = null;
                     while (warpsToBeClosed.Any(x => text.Split('_')[0].Equals(x.Split('_')[0])
                         && (!laterWarps.Contains(x) || (laterWarps.Contains(x) && rippleLvl >= 8))
-                        // && (!laterWarps2.Contains(x) || (laterWarps2.Contains(x) && rippleLvl >= 7)))
+                        && (!laterWarps2.Contains(x) || (laterWarps2.Contains(x) && rippleLvl >= 7))
                         && (!laterWarps3.Contains(x) || (laterWarps3.Contains(x) && rippleLvl >= 6)))
                         || text.StartsWith("WRRA"))
                     {
@@ -1708,10 +1708,10 @@ public class UI : RectangularMenuObject
                         // {
                         //     break; // Hard code not crossing all of torrid for echo
                         // }
-                        if (text.StartsWith("WSKC") && !text.Equals("WSKC_A19"))
-                        {
-                            break; // Hard code not crossing all of stormy for echo
-                        }
+                        // if (text.StartsWith("WSKC") && !text.Equals("WSKC_A19"))
+                        // {
+                        //     break; // Hard code not crossing all of stormy for echo
+                        // }
                         warpToClose = warpsToBeClosed.Where(x => x.StartsWith(text.Split('_')[0])).FirstOrDefault();
                         if (warpToClose == null || warpToClose == "")
                         {
